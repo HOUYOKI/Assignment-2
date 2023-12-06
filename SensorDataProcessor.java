@@ -9,6 +9,11 @@ public class SensorDataProcessor {
     public double[][][] data;
     public double[][] limit;
 
+    // Constants for readability
+    private static final double MIN_AVERAGE_THRESHOLD = 10;
+    private static final double MAX_AVERAGE_THRESHOLD = 50;
+    private static final double CUBE_EXPONENT = 3.0;
+
     // constructor
     public SensorDataProcessor(double[][][] data, double[][] limit) {
         this.data = data;
@@ -34,12 +39,13 @@ public class SensorDataProcessor {
             for (i = 0; i < data.length; i++) {
                 for (j = 0; j < data[0].length; j++) {
                     for (k = 0; k < data[0][0].length; k++) {
-                        data2[i][j][k] = data[i][j][k] / divisor - Math.pow(limit[i][j], 2.0);
-                        if (average(data2[i][j]) > 10 && average(data2[i][j]) < 50)
+                        data2[i][j][k] = data[i][j][k] / divisor - Math.pow(limit[i][j], CUBE_EXPONENT);
+                        if (average(data2[i][j]) > MIN_AVERAGE_THRESHOLD && average(data2[i][j]) < MAX_AVERAGE_THRESHOLD)
                             break;
                         else if (Math.max(data[i][j][k], data2[i][j][k]) > data[i][j][k])
                             break;
-                        else if (Math.pow(Math.abs(data[i][j][k]), 3) < Math.pow(Math.abs(data2[i][j][k]), 3)
+                        else if (Math.pow(Math.abs(data[i][j][k]), CUBE_EXPONENT) <
+                                Math.pow(Math.abs(data2[i][j][k]), CUBE_EXPONENT)
                                 && average(data[i][j]) < data2[i][j][k] && (i + 1) * (j + 1) > 0)
                             data2[i][j][k] *= 2;
                         else
